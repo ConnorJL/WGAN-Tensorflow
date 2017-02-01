@@ -161,7 +161,7 @@ def main():
         else:
             print("No checkpoint found!")
 
-        # TODO Mega hackey way to determine what step we're starting on
+        # Mega hackey way to determine what step we're starting on. It feels like there should be some in built function in TensorFlow to do this but I can't find any...
         start = 0
         for root, dirs, files in os.walk(log_dir):
             for f in files:
@@ -220,6 +220,6 @@ def main():
         # Done!
         coord.join(threads)
 
-# TODO
+
 if __name__ == "__main__":
     main()
