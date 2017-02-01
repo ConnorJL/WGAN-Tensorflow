@@ -27,22 +27,6 @@ clip_per = 1 # Experimental. Clip discriminator weights every this many steps. O
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
-# Helper function. If you load a checkpoint file and it contains variables not in your graph or your graph has variables not in the checkpoint file, it usually errors out. This avoids that.
-def optimistic_restore(session, save_file):
-    reader = tf.train.NewCheckpointReader(save_file)
-    saved_shapes = reader.get_variable_to_shape_map()
-    var_names = sorted([(var.name, var.name.split(':')[0]) for var in tf.global_variables()
-            if var.name.split(':')[0] in saved_shapes])
-    restore_vars = []
-    with tf.variable_scope('', reuse=True):
-        for var_name, saved_var_name in var_names:
-            curr_var = tf.get_variable(saved_var_name)
-            var_shape = curr_var.get_shape().as_list()
-            if var_shape == saved_shapes[saved_var_name]:
-                restore_vars.append(curr_var)
-    saver = tf.train.Saver(restore_vars)
-    saver.restore(session, save_file)
-
 
 def generator(z, training=True, weight_decay=0.0001, batch_norm_decay=0.997,
         batch_norm_epsilon=1e-5, batch_norm_scale=True):
@@ -156,7 +140,7 @@ def main():
         ckpt = tf.train.get_checkpoint_state(log_dir)
         if ckpt and ckpt.model_checkpoint_path:
             print("Checkpoint found! Restoring...")
-            optimistic_restore(sess, ckpt.model_checkpoint_path)
+            saver.restore(sess, ckpt.model_checkpoint_path)
             print("Restored!")
         else:
             print("No checkpoint found!")
