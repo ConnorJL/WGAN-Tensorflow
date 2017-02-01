@@ -136,23 +136,17 @@ def main():
         init_op = tf.global_variables_initializer()
         sess.run(init_op)
 
+        start = 0
         # If a checkpoint is found, restore what you can. If not, continue
         ckpt = tf.train.get_checkpoint_state(log_dir)
         if ckpt and ckpt.model_checkpoint_path:
             print("Checkpoint found! Restoring...")
             saver.restore(sess, ckpt.model_checkpoint_path)
+            # Hackey way to determine what step we're starting on. It feels like there should be some in built function in TensorFlow to do this but I can't find any...
+            start = int(ckpt.model_checkpoint_path.split("-")[-1])+1
             print("Restored!")
         else:
             print("No checkpoint found!")
-
-        # Mega hackey way to determine what step we're starting on. It feels like there should be some in built function in TensorFlow to do this but I can't find any...
-        start = 0
-        for root, dirs, files in os.walk(log_dir):
-            for f in files:
-                if "model" in f:
-                    num = int(f.split("-")[1].split(".")[0])
-                    if num > start:
-                        start = num+1
 
         try:
             current_step = start
