@@ -126,6 +126,11 @@ def main():
     d_train_op = slim.learning.create_train_op(d_loss, d_optimizer, variables_to_train=d_vars)
     g_train_op = slim.learning.create_train_op(g_loss, g_optimizer, variables_to_train=g_vars)
 
+    # Create clipping ops, thanks to PatrykChrabaszcz for this!
+    clip_discriminator = []
+    for var in d_vars:
+        clip_discriminator.append(tf.assign(var, tf.clip_by_value(var, -c, c)))
+
     with tf.Session() as sess:
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(sess, coord)
@@ -163,8 +168,7 @@ def main():
                 for i in xrange(diters):
                     # Clip all discriminator weights to be between -c and c
                     if i % clip_per == 0:
-                        for var in d_vars:
-                            var.assign(tf.clip_by_value(var, -c, c))
+                        sess.run(clip_discriminator)
                     batch_z = np.random.uniform(-1, 1, [batch_size, z_dim]).astype(np.float32)
                     sess.run(d_train_op, feed_dict={z: batch_z})
 
