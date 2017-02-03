@@ -38,7 +38,8 @@ def generator(z, training=True, weight_decay=0.0001, batch_norm_decay=0.997,
         'updates_collections': ops.GraphKeys.UPDATE_OPS,
     }
 
-    z = tf.reshape(z, [batch_size, 1, 1, z_dim])
+    gen = slim.fully_connected(gen, 1024)
+    gen = tf.reshape(gen, [batch_size, 1, 1, 1024])
 
     with arg_scope(
         [slim.conv2d_transpose],
@@ -52,7 +53,7 @@ def generator(z, training=True, weight_decay=0.0001, batch_norm_decay=0.997,
 	# Each tuple is (number of channels, kernel size, stride)
         l = [(1024, [3,3], [2,2]), (512, [3,3], [2,2]), (256, [3,3], [2,2]), (128, [3,3], [2,2]),
             (128, [3,3], [2,2]), (64, [3,3], [2,2]), (3, [3,3], [2,2])]
-        gen = slim.stack(z, slim.conv2d_transpose, l)
+        gen = slim.stack(gen, slim.conv2d_transpose, l)
 
     gen = tf.tanh(gen)
 
