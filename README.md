@@ -9,7 +9,7 @@ Wasserstein GAN (or WGAN) is a variant of Generative Adversarial Networks recent
 
 ## How To
 
-* Create some boilerplate code to load your data into batches and then place that where the "YOURDATAHERE" placeholder is (line 108)
+* Create some boilerplate code to load your data into batches and then place that where the "YOURDATAHERE" placeholder is (line 93)
 * Fiddle with the parameters at the top of the file (and/or add your own architectures for the generator and discriminator)
 * Run it!
 ` python train_WGAN.py `
